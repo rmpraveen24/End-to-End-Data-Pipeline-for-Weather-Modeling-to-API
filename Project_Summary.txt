@@ -1,0 +1,109 @@
+QUESTION: Assume you are asked to get your code running in the cloud using AWS. What tools and AWS services would you use to deploy the API, database, and a scheduled version of your data ingestion code? Write up a description of your approach    
+
+ANSWER:
+	Task	                  	               AWS Service
+Deploying Flask API        ===========>	EC2 (Elastic Compute Cloud)
+To Manage Database         ===========> 	Amazon RDS (Relational Database Service)
+Scheduling Data Ingestion  ===========>		AWS Lambda + CloudWatch Events
+Continuous Deployment      ===========>		AWS CodePipeline 
+Monitoring and Logs        ===========>		Amazon CloudWatch + CloudWatch Logs
+
+
+======================================PROJECT SUMMARY==========================================
+
+TBL_creation.py: 
+1. data base was created using CMD 
+2. Weather Table Table was created in this python file.
+=================================================================================================
+
+Data_ingestion.py
+
+1. Data Processing (data_process):
+
+* Fetches data from GitHub using an API call.
+* Extracts data from .txt files and processes it into a structured format.
+* Stores weather information including station ID, date, max/min temperatures, and precipitation.
+* Creates a Pandas DataFrame from the processed data.
+* Handles and logs duplicate records based on STATION_ID and DATE.
+
+2. Data Insertion into SQLite Database:
+
+* Onetime_insert_data function: A separate function to handle one-time insertion of all weather data.
+
+* insert_data function: Checks for duplicate entries in the SQLite database before inserting new data. Inserts records only if they don't already exist in the database.
+======================================================================================================
+
+Data_analysis.py
+
+Data Analysis (data_analysis):
+
+* Connects to the database and reads weather data table
+* Cleans the data by removing rows with missing temperature and precipitation values (-9999).
+* Converts temperatures from tenths of degrees Celsius to degrees, and precipitation from tenths of millimeters to centimeters.
+* Groups the data by STATION_ID and YEAR, calculating the average max/min temperature and total precipitation for each year.
+* Creates a new table Weather_Stats in the SQLite database.
+* Inserts the computed weather statistics (average temperature and total precipitation) into the Weather_Stats table based on year wise and station wise
+================================================================================
+
+                                              FLASK APPLICATION 
+
+config.py
+* connects to the sqlite3 database (CortevaDB.db)
+----------------------------------------------------------------------------------------
+Models.py
+
+* SQLAlchemy(): Initializes SQLAlchemy to handle database interactions.
+*This module structures weather and weather statistics data in a relational database, allowing for efficient storage and querying in a Flask web application.
+
+-------------------------------------------------------------------------------------------------
+app.py
+* The API is created with versioning (v1.0) and includes Swagger documentation for easy access to API methods.
+* Weather and weather stats model : defines the structure of weather data and weather stats data including the fields.
+* Request Parsers:
+	pagination_parser: Used to filter weather data by DATE (YYYYMMDD) and STATION_ID.
+	weather_stats_pagination_parser: Used to filter weather statistics by YEAR (YYYY) and STATION_ID.
+
+*Routes:
+
+  /API/weather:
+	GET: Retrieves weather data filtered by DATE and STATION_ID using the pagination_parser. The results are returned in the weather_model format.
+
+ /API/weather/stats:
+	GET: Retrieves weather statistics filtered by YEAR and STATION_ID using the weather_stats_pagination_parser. The results are returned in the weather_stats_model format.
+
+ /swagger: Provides a Swagger UI for API documentation.
+
+summary of app.py:
+The API provides access to weather data and weather statistics from a database, allowing users to filter by date, station ID, and year. It also includes automated Swagger documentation for easy interaction with the API.
+
+---------------------------------------------------------------------------------------------------------------------------
+
+run.py
+
+*Weather Data Processing:
+
+	Iterates over the fetched data from Weather_Data, formats it, and prepares it for insertion into the SQLAlchemy Weather model.
+
+*Weather Stats Processing:
+	Similarly, processes data from the Weather_stats table and prepares it for insertion into the SQLAlchemy WeatherStats model.
+
+
+
+---------------------------------------------------------------------------------------------
+Improvements of the application in future:
+
+1. Visual representation can be made more eye catching using html and css.
+2. In future if we receive the data , then we can schedule a script to run on monthly basis or weekly as per requirement so that data is updated.
+3. Using this data we can train and buil ML models. To predict the yield.
+4. We can add one extra field as "Date_Processed" to track when the record was inserted into the DB.
+5. Using this data interactive charts can be created as well for better representation.
+
+
+
+
+
+
+
+
+
+

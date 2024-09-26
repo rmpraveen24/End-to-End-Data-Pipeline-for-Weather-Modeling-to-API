@@ -1,0 +1,20 @@
+TEST case
+===================
+
+
+Weather Data
+
+1. DATE (YYYYMMDD) and Station ID: Passed ===> 1 record fetched ===(expected)
+
+
+Weather stats
+1. Year (YYYY) and Station ID: Passed ===> 1 record fetched ===(expected)
+
+
+
+
+
+
+
+
+
